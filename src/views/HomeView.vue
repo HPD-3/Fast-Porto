@@ -1,919 +1,1012 @@
 <template>
-  <main class="landing-new">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="container hero-container">
-        <Motion
-          :initial="{ opacity: 0, x: -50 }"
-          :animate="{ opacity: 1, x: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="hero-text"
-        >
-          <p class="hero-subtitle">Welcome to my portfolio</p>
-          <h1 class="hero-title">
-            <span class="gradient-text">Creative Designer & Developer</span>
-          </h1>
-          <p class="hero-description">
-            Crafting beautiful, high-performance web experiences with modern design principles and cutting-edge technology.
+  <main class="portfolio-page">
+    <section id="home" class="hero section-light">
+      <div class="shell">
+        <header class="top-nav">
+          <div class="brand">
+            <img :src="logoImage" alt="Brand logo" class="brand-logo brand-logo--invert" />
+            <span>Hafidh</span>
+          </div>
+          <nav class="nav-links">
+            <button
+              v-for="item in navItems"
+              :key="item.id"
+              type="button"
+              :class="{ active: activeSection === item.id }"
+              @click="handleNavClick(item.id)"
+            >
+              {{ item.label }}
+            </button>
+          </nav>
+          <button
+            type="button"
+            class="menu-toggle"
+            aria-label="Toggle navigation menu"
+            :aria-expanded="mobileMenuOpen"
+            @click="mobileMenuOpen = !mobileMenuOpen"
+          >
+            <iconify-icon :icon="mobileMenuOpen ? 'mdi:close' : 'mdi:menu'"></iconify-icon>
+          </button>
+          <RouterLink to="/certificates" class="resume-btn">Resume ⤓</RouterLink>
+        </header>
+        <nav class="mobile-menu" :class="{ open: mobileMenuOpen }">
+          <button
+            v-for="item in navItems"
+            :key="`mobile-${item.id}`"
+            type="button"
+            :class="{ active: activeSection === item.id }"
+            @click="handleNavClick(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        </nav>
+
+        <div class="hero-content">
+          <div class="hero-copy">
+            <p class="eyebrow">Hello I’am <strong>Evren Shah.</strong></p>
+            <h1>
+              Frontend Developer<br />
+              Based In <strong>India.</strong>
+            </h1>
+            <p class="hero-text">
+              I’m Evren Shah. Lorem ipsum is simply dummy text of the printing and typesetting industry.
+              Lorem ipsum has been the industry’s standard dummy text ever since the 1500s.
+            </p>
+            <div class="hero-socials">
+              <a href="#" aria-label="github"><iconify-icon icon="mdi:github"></iconify-icon></a>
+              <a href="#" aria-label="dribbble"><iconify-icon icon="mdi:dribbble"></iconify-icon></a>
+              <a href="#" aria-label="twitter"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
+              <a href="#" aria-label="linkedin"><iconify-icon icon="mdi:linkedin"></iconify-icon></a>
+            </div>
+          </div>
+          <div class="hero-illustration">
+            <img :src="heroBannerImage" alt="Hero banner illustration" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section-light">
+      <div class="shell">
+        <h2 class="section-title">My <strong>Skills</strong></h2>
+        <div class="skills-grid">
+          <article
+            v-for="(skill, index) in skills"
+            :key="`${skill.name}-${index}`"
+            class="skill-card"
+            :class="{ active: selectedSkillIndex === index }"
+            tabindex="0"
+            @mouseenter="selectedSkillIndex = index"
+            @focus="selectedSkillIndex = index"
+          >
+            <span class="skill-icon"><iconify-icon :icon="skill.icon"></iconify-icon></span>
+            <p>{{ skill.name }}</p>
+          </article>
+        </div>
+        <p class="interactive-note">Focused skill: {{ skills[selectedSkillIndex]?.name }}</p>
+      </div>
+    </section>
+
+    <section class="section-dark experience">
+      <div class="shell">
+        <h2 class="section-title">My <strong>Experience</strong></h2>
+        <div class="experience-list">
+          <article v-for="item in experiences" :key="item.company" class="experience-card">
+            <div class="experience-head">
+              <h3>
+                <span class="company-mark"><iconify-icon :icon="item.mark"></iconify-icon></span>
+                {{ item.role }} at {{ item.company }}
+              </h3>
+              <span>{{ item.period }}</span>
+            </div>
+            <p>{{ item.description }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section-light about">
+      <div class="shell about-grid">
+        <div class="about-portrait">
+          <img :src="aboutImage" alt="About profile illustration" />
+        </div>
+        <div>
+          <h2 class="section-title">About <strong>Me</strong></h2>
+          <p>
+            I’m a product designer and front-end developer focused on crafting clear, useful digital
+            experiences. I combine clean visual design with practical engineering to build interfaces
+            that are fast, maintainable, and easy to use.
           </p>
-          <div class="hero-buttons">
-            <RouterLink to="/projects" class="btn btn-primary">View My Work</RouterLink>
-            <RouterLink to="/certificates" class="btn btn-secondary">Learn More</RouterLink>
-          </div>
-        </Motion>
-
-        <Motion
-          :initial="{ opacity: 0, x: 50 }"
-          :animate="{ opacity: 1, x: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut', delay: 0.2 }"
-          class="hero-image"
-        >
-          <div class="profile-circle">
-            <div class="circle-gradient"></div>
-          </div>
-        </Motion>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about-section-new">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, y: 30 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="section-header"
-        >
-          <h2 class="section-title">About Me</h2>
-          <p class="section-subtitle">Get to know me better</p>
-        </Motion>
-
-        <Motion
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut', delay: 0.1 }"
-          class="about-grid"
-        >
-          <div class="about-card">
-            <div class="card-icon">💼</div>
-            <h3>Professional Experience</h3>
-            <p>Multiple years of experience designing and developing web applications that users love.</p>
-          </div>
-          <div class="about-card">
-            <div class="card-icon">🎨</div>
-            <h3>Design Focused</h3>
-            <p>Attention to detail and a passion for creating intuitive, beautiful user interfaces.</p>
-          </div>
-          <div class="about-card">
-            <div class="card-icon">⚡</div>
-            <h3>Performance</h3>
-            <p>Building fast, optimized applications that deliver exceptional user experiences.</p>
-          </div>
-        </Motion>
-      </div>
-    </section>
-
-    <!-- Education Section -->
-    <section class="education-section">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, y: 30 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="section-header"
-        >
-          <h2 class="section-title">Latest Education</h2>
-          <p class="section-subtitle">My most recent academic background</p>
-        </Motion>
-
-        <Motion
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut', delay: 0.1 }"
-          class="education-card"
-        >
-          <h3>{{ latestEducation.degree }}</h3>
-          <p class="education-institution">{{ latestEducation.institution }}</p>
-          <p class="education-period">{{ latestEducation.period }}</p>
-          <p class="education-focus">{{ latestEducation.focus }}</p>
-        </Motion>
-      </div>
-    </section>
-
-    <!-- Technologies Section -->
-    <section class="technologies-section">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, y: 30 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="section-header"
-        >
-          <h2 class="section-title">Technologies & Tools</h2>
-          <p class="section-subtitle">Technologies I work with</p>
-        </Motion>
-
-        <div class="tech-grid">
-          <Motion
-            v-for="(tech, index) in technologies"
-            :key="tech"
-            :initial="{ opacity: 0, scale: 0.8 }"
-            :animate="{ opacity: 1, scale: 1 }"
-            :transition="{ duration: 0.6, ease: 'easeOut', delay: 0.05 * index }"
-            class="tech-badge"
-          >
-            <div class="tech-icon">{{ getTechIcon(tech) }}</div>
-            <p>{{ tech }}</p>
-          </Motion>
+          <p>
+            My work spans design systems, landing pages, and full web applications. I care about
+            accessibility, consistency, and shipping polished details that improve real user outcomes.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Projects Section -->
-    <section class="projects-section-new">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, y: 30 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="section-header"
-        >
-          <h2 class="section-title">Featured Projects</h2>
-          <RouterLink to="/projects" class="view-all">View All Projects →</RouterLink>
-        </Motion>
-
-        <div v-if="loading" class="loading">Loading projects...</div>
-        <div v-else-if="error" class="error">{{ error }}</div>
-        <div v-else class="projects-grid-new">
-          <Motion
-            v-for="(project, index) in featuredProjects"
-            :key="project.id"
-            :initial="{ opacity: 0, y: 30 }"
-            :animate="{ opacity: 1, y: 0 }"
-            :transition="{ duration: 0.6, ease: 'easeOut', delay: 0.1 * index }"
+    <section id="projects" class="section-dark projects">
+      <div class="shell">
+        <h2 class="section-title">My <strong>Projects</strong></h2>
+        <div v-if="projectCategories.length" class="project-filters">
+          <button
+            v-for="category in projectCategories"
+            :key="category"
+            type="button"
+            :class="{ active: selectedProjectCategory === category }"
+            @click="selectedProjectCategory = category"
           >
-            <RouterLink :to="`/projects/${project.id}`" class="project-card-new">
-              <div class="project-image-container">
-                <img v-if="project.imageUrl" :src="project.imageUrl" :alt="project.title" loading="lazy" />
-                <div v-else class="image-placeholder">No Image</div>
-              </div>
-              <div class="project-info-new">
-                <h3>{{ project.title }}</h3>
-                <p class="project-category-new">{{ project.category }}</p>
-                <p class="project-description">{{ project.summary?.substring(0, 80) }}...</p>
-              </div>
-            </RouterLink>
-          </Motion>
+            {{ category }}
+          </button>
+        </div>
+        <div v-if="loading" class="state">Loading projects...</div>
+        <div v-else-if="error" class="state error">{{ error }}</div>
+        <div v-else class="project-list">
+          <article v-for="(project, index) in filteredProjects" :key="project.id" class="project-row">
+            <div class="project-image">
+              <img v-if="project.imageUrl" :src="project.imageUrl" :alt="project.title" loading="lazy" />
+              <div v-else class="project-fallback">{{ String(index + 1).padStart(2, '0') }}</div>
+            </div>
+            <div class="project-copy">
+              <p class="project-index">{{ String(index + 1).padStart(2, '0') }}</p>
+              <h3>{{ project.title }}</h3>
+              <p>{{ project.summary || 'No description available for this project yet.' }}</p>
+              <RouterLink :to="`/projects/${project.id}`" class="project-link">↗</RouterLink>
+            </div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- Certificates Section -->
-    <section class="certificates-section">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, y: 30 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="section-header"
-        >
-          <h2 class="section-title">Certificates & Achievements</h2>
-          <RouterLink to="/certificates" class="view-all">View All →</RouterLink>
-        </Motion>
-
-        <div v-if="certificatesLoading" class="loading">Loading certificates...</div>
-        <div v-else class="certificates-grid">
-          <Motion
-            v-for="(cert, index) in certificates.slice(0, 3)"
-            :key="cert.id"
-            :initial="{ opacity: 0, scale: 0.9 }"
-            :animate="{ opacity: 1, scale: 1 }"
-            :transition="{ duration: 0.6, ease: 'easeOut', delay: 0.1 * index }"
-            class="cert-card-new"
-          >
-            <div class="cert-icon">🏆</div>
-            <h3>{{ cert.title }}</h3>
-            <p class="cert-issuer">{{ cert.issuer }}</p>
-            <p class="cert-date">{{ formatDate(cert.issueDate) }}</p>
-          </Motion>
+    <section class="section-light highlights">
+      <div class="shell">
+        <h2 class="section-title">What I <strong>Offer</strong></h2>
+        <div class="highlights-grid">
+          <article v-for="item in offerings" :key="item.title" class="highlight-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.text }}</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-      <div class="container">
-        <Motion
-          :initial="{ opacity: 0, scale: 0.9 }"
-          :animate="{ opacity: 1, scale: 1 }"
-          :transition="{ duration: 0.8, ease: 'easeOut' }"
-          class="cta-content"
-        >
-          <h2>Ready to work together?</h2>
-          <p>Let's create something amazing. Get in touch and let's discuss your project.</p>
-          <button class="btn btn-primary btn-large">Get In Touch</button>
-        </Motion>
+    <section id="contact" class="section-light contact">
+      <div class="shell contact-grid">
+        <form class="contact-form" @submit.prevent="submitContactForm">
+          <input v-model="contactForm.name" type="text" placeholder="Your name" />
+          <input v-model="contactForm.email" type="email" placeholder="Email" />
+          <input v-model="contactForm.website" type="text" placeholder="Your website (if exists)" />
+          <textarea v-model="contactForm.message" rows="4" placeholder="How can I help?"></textarea>
+          <div class="contact-actions">
+            <button type="submit">Get In Touch</button>
+            <div class="contact-socials">
+              <a href="#" aria-label="github"><iconify-icon icon="mdi:github"></iconify-icon></a>
+              <a href="#" aria-label="dribbble"><iconify-icon icon="mdi:dribbble"></iconify-icon></a>
+              <a href="#" aria-label="twitter"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
+              <a href="#" aria-label="linkedin"><iconify-icon icon="mdi:linkedin"></iconify-icon></a>
+            </div>
+          </div>
+          <p v-if="formError" class="form-feedback error">{{ formError }}</p>
+          <p v-if="formSuccess" class="form-feedback success">{{ formSuccess }}</p>
+        </form>
+        <div class="contact-copy">
+          <h2>Let’s talk for Something special</h2>
+          <p>
+            I seek to push the limits of creativity to create high-engaging user-friendly and memorable
+            interactive experiences.
+          </p>
+          <p class="contact-item">youremail@gmail.com</p>
+          <p class="contact-item">1234567890</p>
+        </div>
       </div>
     </section>
+
+    <footer class="footer section-dark">
+      <div class="shell footer-inner">
+        <div class="brand">
+          <img :src="logoImage" alt="Brand logo" class="brand-logo" />
+          <span>Hafidh</span>
+        </div>
+        <p>© 2019-2023 Personal · Made in Figma</p>
+      </div>
+    </footer>
+
+    <button
+      v-show="showBackToTop"
+      type="button"
+      class="back-to-top"
+      aria-label="Back to top"
+      @click="scrollToSection('home')"
+    >
+      <iconify-icon icon="mdi:arrow-up"></iconify-icon>
+    </button>
   </main>
 </template>
 
-<script>
-import { Motion } from 'motion-v'
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { usePortfolioData } from '@/composables/usePortfolioData'
-import { computed } from 'vue'
+import heroBannerImage from '@/assets/Hero-Banner.svg'
+import aboutImage from '@/assets/About-me-pic.svg'
+import logoImage from '@/assets/logo.png'
 
-export default {
-  name: 'HomeViewNew',
-  components: {
-    Motion,
+const { projects, loading, error } = usePortfolioData()
+
+const navItems = [
+  { id: 'about', label: 'About Me' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'projects', label: 'Project' },
+  { id: 'contact', label: 'Contact Me' },
+]
+
+const activeSection = ref('home')
+const showBackToTop = ref(false)
+const mobileMenuOpen = ref(false)
+const selectedProjectCategory = ref('All')
+const selectedSkillIndex = ref(1)
+const contactForm = ref({
+  name: '',
+  email: '',
+  website: '',
+  message: '',
+})
+const formError = ref('')
+const formSuccess = ref('')
+
+const projectCategories = computed(() => [
+  'All',
+  ...Array.from(new Set(projects.value.map((project) => project.category || 'Other'))),
+])
+
+const filteredProjects = computed(() => {
+  const base =
+    selectedProjectCategory.value === 'All'
+      ? projects.value
+      : projects.value.filter((project) => (project.category || 'Other') === selectedProjectCategory.value)
+  return base.slice(0, 3)
+})
+
+const skills = [
+  { name: 'Git', icon: 'mdi:git' },
+  { name: 'Javascript', icon: 'mdi:language-javascript', active: true },
+  { name: 'Sass/Scss', icon: 'mdi:sass' },
+  { name: 'Nest.Js', icon: 'simple-icons:nestjs' },
+  { name: 'Storybook', icon: 'simple-icons:storybook' },
+  { name: 'Nest.Js', icon: 'simple-icons:nestjs' },
+  { name: 'Git', icon: 'mdi:git' },
+  { name: 'Storybook', icon: 'simple-icons:storybook' },
+  { name: 'Socket.io', icon: 'simple-icons:socketdotio' },
+  { name: 'Sass/Scss', icon: 'mdi:sass' },
+]
+
+const experiences = [
+  {
+    role: 'Lead Software Engineer',
+    company: 'Google',
+    mark: 'logos:google-icon',
+    period: 'Nov 2019 - Present',
+    description:
+      'Led end-to-end implementation across major product areas and improved platform quality by driving performance, architecture, and developer tooling initiatives.',
   },
-  setup() {
-    const { projects, certificates, loading: portfolioLoading } = usePortfolioData()
-
-    const featuredProjects = computed(() => projects.value?.slice(0, 3) || [])
-    const certificatesLoading = computed(() => portfolioLoading.value)
-    const latestEducation = {
-      degree: 'Bachelor of Computer Science',
-      institution: 'University of Technology',
-      period: '2021 - 2025',
-      focus: 'Web Development, Software Engineering, and Cloud Computing',
-    }
-
-    const technologies = [
-      'Vue.js', 'React', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3',
-      'Tailwind CSS', 'Firebase', 'Node.js', 'Git', 'Figma', 'Redux'
-    ]
-
-    const getTechIcon = (tech) => {
-      const icons = {
-        'Vue.js': '🖖',
-        'React': '⚛️',
-        'JavaScript': '⚡',
-        'TypeScript': '📘',
-        'HTML5': '🏗️',
-        'CSS3': '🎨',
-        'Tailwind CSS': '💨',
-        'Firebase': '🔥',
-        'Node.js': '🟢',
-        'Git': '📦',
-        'Figma': '✏️',
-        'Redux': '🔄',
-      }
-      return icons[tech] || '✨'
-    }
-
-    const formatDate = (date) => {
-      if (!date) return ''
-      const parsedDate = new Date(date)
-      if (Number.isNaN(parsedDate.getTime())) {
-        return String(date)
-      }
-      return parsedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-    }
-
-    return {
-      featuredProjects,
-      certificates,
-      certificatesLoading,
-      loading: portfolioLoading,
-      latestEducation,
-      technologies,
-      getTechIcon,
-      formatDate,
-    }
+  {
+    role: 'Software Engineer',
+    company: 'YouTube',
+    mark: 'logos:youtube-icon',
+    period: 'Jan 2017 - Oct 2019',
+    description:
+      'Built internal systems and creator-facing features, focusing on reliability, delivery speed, and measurable UX improvements for core surfaces.',
   },
+  {
+    role: 'Junior Software Engineer',
+    company: 'Apple',
+    mark: 'logos:apple',
+    period: 'Jan 2016 - Dec 2017',
+    description:
+      'Contributed to foundational UI modules and collaborated across design and engineering teams to ship maintainable components at scale.',
+  },
+]
+
+const offerings = [
+  {
+    title: 'Website Design',
+    text: 'Modern interface design focused on clear structure, branding consistency, and user-friendly layout.',
+  },
+  {
+    title: 'Frontend Development',
+    text: 'Fast and responsive web apps built with clean component architecture and maintainable code.',
+  },
+  {
+    title: 'Performance Optimization',
+    text: 'Improved loading speed, accessibility, and SEO to deliver better user experience and reach.',
+  },
+]
+
+function scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId)
+  if (!section) return
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+function handleNavClick(sectionId) {
+  mobileMenuOpen.value = false
+  scrollToSection(sectionId)
+}
+
+function updateScrollState() {
+  const sectionIds = ['home', 'skills', 'about', 'projects', 'contact']
+  const triggerLine = window.scrollY + 120
+
+  for (const id of sectionIds) {
+    const element = document.getElementById(id)
+    if (!element) continue
+    const start = element.offsetTop
+    const end = start + element.offsetHeight
+    if (triggerLine >= start && triggerLine < end) {
+      activeSection.value = id
+      break
+    }
+  }
+
+  showBackToTop.value = window.scrollY > 500
+}
+
+function submitContactForm() {
+  formError.value = ''
+  formSuccess.value = ''
+
+  const { name, email, message } = contactForm.value
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  if (!name.trim() || !email.trim() || !message.trim()) {
+    formError.value = 'Please fill name, email, and message.'
+    return
+  }
+
+  if (!emailPattern.test(email)) {
+    formError.value = 'Please enter a valid email address.'
+    return
+  }
+
+  formSuccess.value = 'Thanks! Your message is ready to be sent.'
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', updateScrollState, { passive: true })
+  updateScrollState()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateScrollState)
+})
 </script>
 
 <style scoped>
-/* Root Variables */
-:root {
-  --primary-blue: #3B82F6;
-  --primary-dark: #2563EB;
-  --secondary-blue: #1E40AF;
-  --dark-bg: #0F172A;
-  --card-bg: #1E293B;
-  --border-color: rgba(59, 130, 246, 0.2);
-  --text-primary: #FFFFFF;
-  --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  --gradient: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+.portfolio-page {
+  background: #e9e9e9;
+  color: #101010;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.landing-new {
-  background: var(--dark-bg);
-  color: var(--text-primary);
-  overflow-x: hidden;
-}
-
-.container {
-  max-width: 1200px;
+.shell {
+  width: min(100%, 1080px);
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.25rem;
 }
 
-/* Hero Section */
-.hero-section {
-  min-height: 100vh;
+.section-light {
+  background: #e9e9e9;
+  padding: 1.6rem 0;
+}
+
+.section-dark {
+  background: #0b0b0b;
+  color: #f4f4f4;
+  padding: 1.9rem 0;
+}
+
+.top-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 1) 0%, rgba(30, 41, 59, 0.5) 100%);
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between;
+  gap: 1rem;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 1080px);
+  padding: 0.6rem 1.25rem;
+  background: rgba(233, 233, 233, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #cfcfcf;
+  z-index: 50;
 }
 
-.hero-section::before {
-  content: '';
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  top: -100px;
-  left: -100px;
-  z-index: 0;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  font-size: 0.88rem;
 }
 
-.hero-section::after {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
-  bottom: -50px;
-  right: -50px;
-  z-index: 0;
+.brand-logo {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  display: block;
 }
 
-.hero-container {
+.brand-logo--invert {
+  filter: invert(1);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.4rem;
+}
+
+.nav-links button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font-size: 0.83rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.nav-links button.active {
+  border-bottom-color: #111;
+}
+
+.menu-toggle {
+  display: none;
+  border: 1px solid #111;
+  background: transparent;
+  border-radius: 0.3rem;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  cursor: pointer;
+}
+
+.menu-toggle iconify-icon {
+  font-size: 1.05rem;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.resume-btn {
+  text-decoration: none;
+  color: #fff;
+  background: #111;
+  border: 1px solid #111;
+  border-radius: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.78rem;
+}
+
+.hero-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  position: relative;
-  z-index: 1;
+  gap: 1rem;
+  align-items: end;
+  border-bottom: 1px solid #202020;
+  padding: 4.1rem 0 0.9rem;
+}
+
+.eyebrow {
+  font-size: 1.8rem;
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+h1 {
+  font-size: 2.3rem;
+  line-height: 1.06;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
 }
 
 .hero-text {
-  animation-duration: 0.8s;
+  max-width: 560px;
+  color: #4a4a4a;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
-.hero-subtitle {
-  color: var(--primary-blue);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
-}
-
-.hero-title {
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-}
-
-.gradient-text {
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-description {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  line-height: 1.8;
-  margin-bottom: 2rem;
-  max-width: 500px;
-}
-
-.hero-buttons {
+.hero-socials {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
 }
 
-.hero-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.profile-circle {
-  width: 300px;
-  height: 300px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.circle-gradient {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--gradient);
-  padding: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.circle-gradient::after {
-  content: '';
-  position: absolute;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
-  border-radius: 50%;
-  background: var(--dark-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Buttons */
-.btn {
-  display: inline-block;
-  padding: 14px 32px;
-  border-radius: 50px;
+.hero-socials a {
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid #111;
+  border-radius: 0.2rem;
+  display: grid;
+  place-items: center;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-  overflow: hidden;
+  color: #111;
+  font-size: 0.68rem;
 }
 
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+.hero-socials iconify-icon,
+.contact-socials iconify-icon {
+  font-size: 0.88rem;
 }
 
-.btn:hover::before {
-  width: 300px;
-  height: 300px;
+.hero-illustration {
+  height: 250px;
+  display: grid;
+  place-items: end center;
 }
 
-.btn-primary {
-  background: var(--primary-blue);
-  color: white;
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--text-primary);
-  border: 2px solid rgba(59, 130, 246, 0.5);
-}
-
-.btn-secondary:hover {
-  border-color: var(--primary-blue);
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.btn-large {
-  padding: 18px 48px;
-  font-size: 1rem;
-}
-
-/* Section Headers */
-.section-header {
-  text-align: center;
-  margin-bottom: 4rem;
+.hero-illustration img {
+  width: min(100%, 360px);
+  max-height: 250px;
+  object-fit: contain;
 }
 
 .section-title {
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 700;
+  text-align: center;
+  font-size: 2.2rem;
   margin-bottom: 1rem;
 }
 
-.section-subtitle {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
+.section-title strong {
+  font-weight: 700;
 }
 
-.view-all {
-  display: inline-block;
-  color: var(--primary-blue);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  padding: 10px 20px;
-  border-radius: 50px;
-  margin-top: 1rem;
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
-.view-all:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: var(--primary-blue);
-  transform: translateX(3px);
+.skill-card {
+  border: 1px solid #262626;
+  min-height: 90px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 0.6rem;
+  background: #f8f8f8;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-/* About Section */
-.about-section-new {
-  padding: 6rem 2rem;
-  background: var(--dark-bg);
+.skill-card.active {
+  background: #0f0f0f;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.skill-icon {
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.skill-card p {
+  font-size: 0.84rem;
+}
+
+.interactive-note {
+  margin-top: 0.5rem;
+  font-size: 0.76rem;
+  color: #555;
+  text-align: center;
+}
+
+.experience .section-title,
+.projects .section-title {
+  color: #fff;
+}
+
+.experience-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.experience-card {
+  border: 1px solid #2d2d2d;
+  border-radius: 0.35rem;
+  padding: 0.9rem;
+  background: #111;
+}
+
+.experience-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.experience-head h3 {
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.company-mark {
+  width: 1rem;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+}
+
+.experience-head span {
+  font-size: 0.74rem;
+  color: #9b9b9b;
+}
+
+.experience-card p {
+  font-size: 0.78rem;
+  color: #c7c7c7;
 }
 
 .about-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-.about-card {
-  background: rgba(59, 130, 246, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.about-card:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: var(--primary-blue);
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
-}
-
-.card-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.about-card h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.about-card p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* Education Section */
-.education-section {
-  padding: 6rem 2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 100%);
-}
-
-.education-card {
-  max-width: 760px;
-  margin: 0 auto;
-  background: rgba(59, 130, 246, 0.06);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  backdrop-filter: blur(10px);
-}
-
-.education-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.education-institution {
-  color: var(--primary-blue);
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.education-period {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
-}
-
-.education-focus {
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-/* Technologies Section */
-.technologies-section {
-  padding: 6rem 2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
-}
-
-.tech-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1.5rem;
-}
-
-.tech-badge {
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.tech-badge:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: var(--primary-blue);
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
-}
-
-.tech-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.tech-badge p {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-/* Projects Section */
-.projects-section-new {
-  padding: 6rem 2rem;
-  background: var(--dark-bg);
-}
-
-.projects-grid-new {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.project-card-new {
-  display: block;
-  background: rgba(59, 130, 246, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  height: 100%;
-}
-
-.project-card-new:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: var(--primary-blue);
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
-}
-
-.project-image-container {
-  width: 100%;
-  height: 200px;
-  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-  overflow: hidden;
-  display: flex;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 0.7rem;
   align-items: center;
-  justify-content: center;
 }
 
-.project-image-container img {
+.about-portrait {
+  border: 0px solid #1b1b1b;
+  border-radius: 0.45rem;
+  min-height: 250px;
+  background: transparent;
+  overflow: hidden;
+}
+
+.about-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.about p {
+  font-size: 0.84rem;
+  color: #3f3f3f;
+  margin-bottom: 0.55rem;
+}
+
+.project-list {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.project-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.project-filters button {
+  border: 1px solid #494949;
+  background: transparent;
+  color: #d8d8d8;
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.project-filters button.active {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+.project-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.project-row:nth-child(2n) .project-image {
+  order: 2;
+}
+
+.project-row:nth-child(2n) .project-copy {
+  order: 1;
+}
+
+.project-image {
+  border-radius: 0.45rem;
+  overflow: hidden;
+  border: 1px solid #222;
+  min-height: 180px;
+  background: #181818;
+}
+
+.project-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
 }
 
-.project-card-new:hover .project-image-container img {
-  transform: scale(1.05);
-}
-
-.image-placeholder {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.project-info-new {
-  padding: 1.5rem;
-}
-
-.project-info-new h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.project-category-new {
-  display: inline-block;
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--primary-blue);
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-
-.project-description {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  line-height: 1.6;
-}
-
-/* Certificates Section */
-.certificates-section {
-  padding: 6rem 2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
-}
-
-.certificates-grid {
+.project-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  place-items: center;
+  font-size: 2rem;
+  color: #8f8f8f;
 }
 
-.cert-card-new {
-  background: rgba(59, 130, 246, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.cert-card-new:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: var(--primary-blue);
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
-}
-
-.cert-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.cert-card-new h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.cert-issuer {
-  color: var(--primary-blue);
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-.cert-date {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-}
-
-/* CTA Section */
-.cta-section {
-  padding: 6rem 2rem;
-  background: var(--gradient);
-  text-align: center;
-}
-
-.cta-content h2 {
-  font-size: clamp(2rem, 5vw, 3rem);
+.project-index {
+  font-size: 1.7rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-  color: white;
 }
 
-.cta-content p {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 2rem;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+.project-copy h3 {
+  font-size: 1.4rem;
+  margin: 0.15rem 0;
 }
 
-/* Loading & Error States */
-.loading,
-.error {
+.project-copy p {
+  font-size: 0.82rem;
+  color: #c3c3c3;
+  max-width: 460px;
+}
+
+.project-link {
+  text-decoration: none;
+  color: #fff;
+  display: inline-block;
+  margin-top: 0.6rem;
+}
+
+.highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.highlight-card {
+  border: 1px solid #d4d4d4;
+  border-radius: 0.55rem;
+  background: #f6f6f6;
+  padding: 1.1rem;
+  min-height: 130px;
+}
+
+.highlight-card h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.55rem;
+  font-weight: 700;
+}
+
+.highlight-card p {
+  font-size: 0.82rem;
+  color: #3f3f3f;
+  line-height: 1.55;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.3rem;
+}
+
+.contact-form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  border: 1px solid #1e1e1e;
+  background: #ececec;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.12rem;
+  font: inherit;
+}
+
+.contact-form button {
+  border: 0;
+  background: #111;
+  color: #fff;
+  padding: 0.58rem 0.72rem;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.form-feedback {
+  font-size: 0.76rem;
+  margin-top: 0.1rem;
+}
+
+.form-feedback.error {
+  color: #b91c1c;
+}
+
+.form-feedback.success {
+  color: #166534;
+}
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-socials {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.contact-socials a {
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid #111;
+  border-radius: 0.2rem;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  color: #111;
+  font-size: 0.68rem;
+}
+
+.contact-copy h2 {
+  font-size: 2.2rem;
+  line-height: 1.05;
+  margin-bottom: 0.4rem;
+}
+
+.contact-copy p {
+  font-size: 0.84rem;
+  color: #3e3e3e;
+}
+
+.contact-item {
+  color: #111 !important;
+  font-weight: 600;
+  margin-top: 0.45rem;
+}
+
+.footer {
+  padding: 0.8rem 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.78rem;
+}
+
+.footer .brand-logo {
+  filter: invert(1);
+}
+
+.state {
+  color: #d0d0d0;
   text-align: center;
-  padding: 3rem 2rem;
-  color: var(--text-secondary);
-  font-size: 1.125rem;
+  padding: 1rem 0;
 }
 
-.error {
-  color: #EF4444;
+.state.error {
+  color: #ff6b6b;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .hero-container {
+.back-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 900px) {
+  .hero-content,
+  .about-grid,
+  .project-row,
+  .contact-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
   }
 
-  .hero-image {
-    margin-top: 2rem;
+  .project-row:nth-child(2n) .project-image,
+  .project-row:nth-child(2n) .project-copy {
+    order: initial;
   }
 
-  .profile-circle {
-    width: 200px;
-    height: 200px;
+  .skills-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .hero-buttons {
-    flex-direction: column;
+  .highlights-grid {
+    grid-template-columns: 1fr;
   }
 
-  .btn {
-    width: 100%;
+  .contact-copy h2 {
+    font-size: 2.1rem;
   }
 
-  .hero-title {
+  .eyebrow {
+    font-size: 1.4rem;
+  }
+
+  h1 {
     font-size: 2rem;
   }
 
-  .about-grid,
-  .projects-grid-new,
-  .certificates-grid {
-    grid-template-columns: 1fr;
+  .nav-links {
+    display: none;
   }
 
-  .tech-grid {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  .resume-btn {
+    display: none;
   }
 
-  .section-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .menu-toggle {
+    display: grid;
   }
 
-  .view-all {
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 0 1rem;
+  .top-nav {
+    padding: 0.5rem 1rem;
   }
 
-  .hero-section {
-    min-height: auto;
-    padding: 3rem 1rem;
+  .mobile-menu {
+    display: grid;
+    position: fixed;
+    top: 3.1rem;
+    left: 0.8rem;
+    right: 0.8rem;
+    background: rgba(233, 233, 233, 0.97);
+    border: 1px solid #cfcfcf;
+    border-radius: 0.45rem;
+    padding: 0.45rem;
+    gap: 0.2rem;
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 49;
   }
 
-  .hero-title {
-    font-size: 1.5rem;
+  .mobile-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
-  .hero-description {
-    font-size: 1rem;
+  .mobile-menu button {
+    border: 0;
+    background: transparent;
+    text-align: left;
+    padding: 0.55rem 0.45rem;
+    border-radius: 0.3rem;
+    font-size: 0.86rem;
+    cursor: pointer;
   }
 
-  .tech-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .btn {
-    padding: 12px 24px;
-    font-size: 0.75rem;
+  .mobile-menu button.active {
+    background: #111;
+    color: #fff;
   }
 }
 </style>

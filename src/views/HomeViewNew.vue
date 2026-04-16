@@ -4,8 +4,8 @@
       <div class="shell">
         <header class="top-nav">
           <div class="brand">
-            <iconify-icon class="brand-dot" icon="tabler:fingerprint"></iconify-icon>
-            <span>Personal</span>
+            <img :src="logoImage" alt="Brand logo" class="brand-logo brand-logo--invert" />
+            <span>Hafidh</span>
           </div>
           <nav class="nav-links">
             <button
@@ -158,13 +158,23 @@
       </div>
     </section>
 
-    <section class="section-light highlights">
+    <section id="certificates" class="section-light certificates">
       <div class="shell">
-        <h2 class="section-title">What I <strong>Offer</strong></h2>
-        <div class="highlights-grid">
-          <article v-for="item in offerings" :key="item.title" class="highlight-card">
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.text }}</p>
+        <h2 class="section-title">My <strong>Certificates</strong></h2>
+        <div v-if="loading" class="state">Loading certificates...</div>
+        <div v-else class="highlights-grid">
+          <article v-for="certificate in featuredCertificates" :key="certificate.id" class="highlight-card">
+            <h3>{{ certificate.title }}</h3>
+            <p>{{ certificate.issuer }} · {{ certificate.year }}</p>
+            <a
+              v-if="certificate.verifyUrl"
+              :href="certificate.verifyUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="certificate-link"
+            >
+              Verify ↗
+            </a>
           </article>
         </div>
       </div>
@@ -204,10 +214,10 @@
     <footer class="footer section-dark">
       <div class="shell footer-inner">
         <div class="brand">
-          <iconify-icon class="brand-dot" icon="tabler:fingerprint"></iconify-icon>
-          <span>Personal</span>
+          <img :src="logoImage" alt="Brand logo" class="brand-logo" />
+          <span>Hafidh</span>
         </div>
-        <p>© 2019-2023 Personal · Made in Figma</p>
+        <p>© 2019-2023 Hafidh · Made With ❤︎</p>
       </div>
     </footer>
 
@@ -228,8 +238,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { usePortfolioData } from '@/composables/usePortfolioData'
 import heroBannerImage from '@/assets/Hero-Banner.svg'
 import aboutImage from '@/assets/About-me-pic.svg'
+import logoImage from '@/assets/logo.png'
 
-const { projects, loading, error } = usePortfolioData()
+const { projects, certificates, loading, error } = usePortfolioData()
 
 const navItems = [
   { id: 'about', label: 'About Me' },
@@ -264,6 +275,8 @@ const filteredProjects = computed(() => {
       : projects.value.filter((project) => (project.category || 'Other') === selectedProjectCategory.value)
   return base.slice(0, 3)
 })
+
+const featuredCertificates = computed(() => certificates.value.slice(0, 3))
 
 const skills = [
   { name: 'Git', icon: 'mdi:git' },
@@ -302,21 +315,6 @@ const experiences = [
     period: 'Jan 2016 - Dec 2017',
     description:
       'Contributed to foundational UI modules and collaborated across design and engineering teams to ship maintainable components at scale.',
-  },
-]
-
-const offerings = [
-  {
-    title: 'Website Design',
-    text: 'Modern interface design focused on clear structure, branding consistency, and user-friendly layout.',
-  },
-  {
-    title: 'Frontend Development',
-    text: 'Fast and responsive web apps built with clean component architecture and maintainable code.',
-  },
-  {
-    title: 'Performance Optimization',
-    text: 'Improved loading speed, accessibility, and SEO to deliver better user experience and reach.',
   },
 ]
 
@@ -427,8 +425,15 @@ onBeforeUnmount(() => {
   font-size: 0.88rem;
 }
 
-.brand-dot {
-  font-size: 0.95rem;
+.brand-logo {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-logo--invert {
+  filter: invert(1);
 }
 
 .nav-links {
@@ -789,6 +794,15 @@ h1 {
   line-height: 1.55;
 }
 
+.certificate-link {
+  display: inline-block;
+  margin-top: 0.55rem;
+  text-decoration: none;
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -881,6 +895,10 @@ h1 {
   align-items: center;
   gap: 1rem;
   font-size: 0.78rem;
+}
+
+.footer .brand-logo {
+  filter: brightness(0) invert(1) contrast(1.2);
 }
 
 .state {
