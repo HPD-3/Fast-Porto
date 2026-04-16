@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAllowedAdminEmail() {
+      return request.auth != null && request.auth.token.email == 'hapidh333@gmail.com';
+    }
+
+    match /projects/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAllowedAdminEmail();
+    }
+
+    match /certificates/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAllowedAdminEmail();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

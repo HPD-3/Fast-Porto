@@ -25,6 +25,18 @@ const router = createRouter({
       component: () => import('../views/CertificatesView.vue'),
     },
     {
+      path: '/certificates/:id',
+      name: 'certificate-detail',
+      component: () => import('../views/CertificateDetailView.vue'),
+    },
+    {
+      path: '/:legacyCertificateId(certificate-.+)',
+      redirect: (to) => {
+        const id = String(to.params.legacyCertificateId).replace(/^certificate-/, '')
+        return { name: 'certificate-detail', params: { id } }
+      },
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue'),

@@ -34,8 +34,11 @@ VITE_FIREBASE_PROJECT_ID=...
 VITE_FIREBASE_STORAGE_BUCKET=...
 VITE_FIREBASE_MESSAGING_SENDER_ID=...
 VITE_FIREBASE_APP_ID=...
+VITE_IMGBB_API_KEY=...
 VITE_API_BASE_URL=http://localhost:3001
 ```
+
+Important: do not hardcode Firebase values in source files. Keep them only in environment variables so they are not embedded as fallback literals in deployed JS.
 
 ## Environment variables (server)
 Set this variable for `server/server.js`:
@@ -54,6 +57,11 @@ PORT=3001
   - `title`, `issuer`, `year`, `imageUrl`, `verifyUrl`, `status`
 
 Use `status: "published"` to show items on public pages.
+
+## Image upload (free option)
+- Admin image file uploads can use ImgBB free API.
+- Set `VITE_IMGBB_API_KEY` in `.env` to enable file upload from `/admin`.
+- Uploaded image URL is saved into Firestore `imageUrl`.
 
 ## API endpoints
 - Public
@@ -86,10 +94,11 @@ npm run dev
 ## Firebase rules and indexes
 - Rules: `firestore.rules`
 - Indexes: `firestore.indexes.json`
+- Storage rules: `storage.rules`
 
 Deploy after setup:
 
 ```sh
-firebase deploy --only firestore:rules,firestore:indexes
+firebase deploy --only firestore:rules,firestore:indexes,storage
 ```
 # Fast-Porto

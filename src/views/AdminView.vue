@@ -26,6 +26,7 @@ const password = ref('')
 const authError = ref('')
 const actionMessage = ref('')
 const provider = new GoogleAuthProvider()
+const imgbbApiKey = import.meta.env.VITE_IMGBB_API_KEY || ''
 
 function isAllowedAdminEmail(value) {
   return typeof value === 'string' && value.toLowerCase() === allowedAdminEmail
@@ -61,6 +62,8 @@ const certificateForm = ref({
   verifyUrl: '',
   status: 'published',
 })
+const projectImageFile = ref(null)
+const certificateImageFile = ref(null)
 
 const unsubscribe = onAuthStateChanged(auth, (user) => {
   if (user && !isAllowedAdminEmail(user.email || '')) {
@@ -121,13 +124,19 @@ async function submitProject() {
   authError.value = ''
   actionMessage.value = ''
   try {
+    let imageUrl = projectForm.value.imageUrl
+    if (projectImageFile.value) {
+      imageUrl = await uploadImageToImgBB(projectImageFile.value)
+    }
     await createProject({
       ...projectForm.value,
+      imageUrl,
       techStack: projectForm.value.techStack
         .split(',')
         .map((item) => item.trim())
         .filter(Boolean),
     })
+    projectImageFile.value = null
     actionMessage.value = 'Project created.'
   } catch (err) {
     authError.value = err.message
@@ -138,11 +147,62 @@ async function submitCertificate() {
   authError.value = ''
   actionMessage.value = ''
   try {
-    await createCertificate(certificateForm.value)
+    let imageUrl = certificateForm.value.imageUrl
+    if (certificateImageFile.value) {
+      imageUrl = await uploadImageToImgBB(certificateImageFile.value)
+    }
+    await createCertificate({
+      ...certificateForm.value,
+      imageUrl,
+    })
+    certificateImageFile.value = null
     actionMessage.value = 'Certificate created.'
   } catch (err) {
     authError.value = err.message
   }
+}
+
+function onProjectImageChange(event) {
+  const [file] = event.target.files || []
+  projectImageFile.value = file || null
+}
+
+function onCertificateImageChange(event) {
+  const [file] = event.target.files || []
+  certificateImageFile.value = file || null
+}
+
+async function uploadImageToImgBB(file) {
+  if (!imgbbApiKey) {
+    throw new Error('Missing VITE_IMGBB_API_KEY in .env')
+  }
+  const formData = new FormData()
+  formData.append('image', file)
+
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!response.ok) {
+    throw new Error('ImgBB upload failed.')
+  }
+
+  const result = await response.json()
+  const uploadedUrl = result?.data?.display_url || result?.data?.url
+  if (!uploadedUrl) {
+    throw new Error('ImgBB did not return image URL.')
+  }
+  return normalizeImageUrl(uploadedUrl)
+}
+
+function normalizeImageUrl(url) {
+  const value = String(url || '').trim()
+  if (!value) return ''
+  if (/^https?:\/\//i.test(value)) {
+    return value.replace(/^http:\/\//i, 'https://')
+  }
+  return `https://${value}`
 }
 
 async function removeProject(id) {
@@ -203,7 +263,8 @@ async function removeCertificate(id) {
               <input v-model="projectForm.title" placeholder="Title" />
               <textarea v-model="projectForm.summary" placeholder="Summary" rows="3" />
               <input v-model="projectForm.category" placeholder="Category (Web, Mobile, etc.)" />
-              <input v-model="projectForm.imageUrl" placeholder="Image URL" />
+              <input type="file" accept="image/*" @change="onProjectImageChange" />
+              <input v-model="projectForm.imageUrl" placeholder="Image URL fallback (optional)" />
               <input v-model="projectForm.projectUrl" placeholder="Live project URL" />
               <input v-model="projectForm.repoUrl" placeholder="Repository URL" />
               <input v-model="projectForm.techStack" placeholder="Tech stack (comma separated)" />
@@ -217,7 +278,8 @@ async function removeCertificate(id) {
               <input v-model="certificateForm.title" placeholder="Certificate title" />
               <input v-model="certificateForm.issuer" placeholder="Issuer" />
               <input v-model.number="certificateForm.year" type="number" placeholder="Year" />
-              <input v-model="certificateForm.imageUrl" placeholder="Image URL" />
+              <input type="file" accept="image/*" @change="onCertificateImageChange" />
+              <input v-model="certificateForm.imageUrl" placeholder="Image URL fallback (optional)" />
               <input v-model="certificateForm.verifyUrl" placeholder="Verification URL" />
               <button @click="submitCertificate">Create Certificate</button>
             </div>

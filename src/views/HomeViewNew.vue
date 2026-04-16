@@ -3,10 +3,7 @@
     <section id="home" class="hero section-light">
       <div class="shell">
         <header class="top-nav">
-          <div class="brand">
-            <img :src="logoImage" alt="Brand logo" class="brand-logo brand-logo--invert" />
-            <span>Hafidh</span>
-          </div>
+          <BrandLogo name="Hafidh" :invert="true" />
           <nav class="nav-links">
             <button
               v-for="item in navItems"
@@ -52,12 +49,7 @@
               I’m Evren Shah. Lorem ipsum is simply dummy text of the printing and typesetting industry.
               Lorem ipsum has been the industry’s standard dummy text ever since the 1500s.
             </p>
-            <div class="hero-socials">
-              <a href="#" aria-label="github"><iconify-icon icon="mdi:github"></iconify-icon></a>
-              <a href="#" aria-label="dribbble"><iconify-icon icon="mdi:dribbble"></iconify-icon></a>
-              <a href="#" aria-label="twitter"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
-              <a href="#" aria-label="linkedin"><iconify-icon icon="mdi:linkedin"></iconify-icon></a>
-            </div>
+            <SocialLinks class="hero-socials" />
           </div>
           <div class="hero-illustration">
             <img :src="heroBannerImage" alt="Hero banner illustration" />
@@ -68,7 +60,7 @@
 
     <section id="skills" class="section-light">
       <div class="shell">
-        <h2 class="section-title">My <strong>Skills</strong></h2>
+        <SectionTitle normal="My " highlight="Skills" />
         <div class="skills-grid">
           <article
             v-for="(skill, index) in skills"
@@ -89,7 +81,7 @@
 
     <section class="section-dark experience">
       <div class="shell">
-        <h2 class="section-title">My <strong>Experience</strong></h2>
+        <SectionTitle normal="My " highlight="Experience" :dark="true" />
         <div class="experience-list">
           <article v-for="item in experiences" :key="item.company" class="experience-card">
             <div class="experience-head">
@@ -111,7 +103,7 @@
           <img :src="aboutImage" alt="About profile illustration" />
         </div>
         <div>
-          <h2 class="section-title">About <strong>Me</strong></h2>
+          <SectionTitle normal="About " highlight="Me" />
           <p>
             I’m a product designer and front-end developer focused on crafting clear, useful digital
             experiences. I combine clean visual design with practical engineering to build interfaces
@@ -127,7 +119,7 @@
 
     <section id="projects" class="section-dark projects">
       <div class="shell">
-        <h2 class="section-title">My <strong>Projects</strong></h2>
+        <SectionTitle normal="My " highlight="Projects" :dark="true" />
         <div v-if="projectCategories.length" class="project-filters">
           <button
             v-for="category in projectCategories"
@@ -160,15 +152,23 @@
 
     <section id="certificates" class="section-light certificates">
       <div class="shell">
-        <h2 class="section-title">My <strong>Certificates</strong></h2>
+        <SectionTitle normal="My " highlight="Certificates" />
         <div v-if="loading" class="state">Loading certificates...</div>
         <div v-else class="highlights-grid">
           <article v-for="certificate in featuredCertificates" :key="certificate.id" class="highlight-card">
+            <img
+              v-if="certificate.imageUrl"
+              :src="normalizeImageUrl(certificate.imageUrl)"
+              :alt="certificate.title"
+              class="certificate-image"
+              @error="onImageError"
+              loading="lazy"
+            />
             <h3>{{ certificate.title }}</h3>
             <p>{{ certificate.issuer }} · {{ certificate.year }}</p>
             <a
               v-if="certificate.verifyUrl"
-              :href="certificate.verifyUrl"
+              :href="normalizeExternalUrl(certificate.verifyUrl)"
               target="_blank"
               rel="noopener noreferrer"
               class="certificate-link"
@@ -189,12 +189,7 @@
           <textarea v-model="contactForm.message" rows="4" placeholder="How can I help?"></textarea>
           <div class="contact-actions">
             <button type="submit">Get In Touch</button>
-            <div class="contact-socials">
-              <a href="#" aria-label="github"><iconify-icon icon="mdi:github"></iconify-icon></a>
-              <a href="#" aria-label="dribbble"><iconify-icon icon="mdi:dribbble"></iconify-icon></a>
-              <a href="#" aria-label="twitter"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
-              <a href="#" aria-label="linkedin"><iconify-icon icon="mdi:linkedin"></iconify-icon></a>
-            </div>
+            <SocialLinks class="contact-socials" />
           </div>
           <p v-if="formError" class="form-feedback error">{{ formError }}</p>
           <p v-if="formSuccess" class="form-feedback success">{{ formSuccess }}</p>
@@ -213,10 +208,7 @@
 
     <footer class="footer section-dark">
       <div class="shell footer-inner">
-        <div class="brand">
-          <img :src="logoImage" alt="Brand logo" class="brand-logo" />
-          <span>Hafidh</span>
-        </div>
+        <BrandLogo name="Hafidh" />
         <p>© 2019-2023 Hafidh · Made With ❤︎</p>
       </div>
     </footer>
@@ -238,7 +230,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { usePortfolioData } from '@/composables/usePortfolioData'
 import heroBannerImage from '@/assets/Hero-Banner.svg'
 import aboutImage from '@/assets/About-me-pic.svg'
-import logoImage from '@/assets/logo.png'
+import BrandLogo from '@/components/BrandLogo.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
+import SocialLinks from '@/components/SocialLinks.vue'
 
 const { projects, certificates, loading, error } = usePortfolioData()
 
@@ -351,7 +345,7 @@ function submitContactForm() {
   formError.value = ''
   formSuccess.value = ''
 
-  const { name, email, message } = contactForm.value
+  const { name, email, website, message } = contactForm.value
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   if (!name.trim() || !email.trim() || !message.trim()) {
@@ -364,7 +358,41 @@ function submitContactForm() {
     return
   }
 
-  formSuccess.value = 'Thanks! Your message is ready to be sent.'
+  const targetEmail = 'youremail@gmail.com'
+  const subject = encodeURIComponent(`Portfolio inquiry from ${name.trim()}`)
+  const body = encodeURIComponent(
+    `Name: ${name.trim()}\nEmail: ${email.trim()}\nWebsite: ${website.trim() || '-'}\n\nMessage:\n${message.trim()}`,
+  )
+
+  window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`
+  formSuccess.value = 'Opening your email app with pre-filled message...'
+}
+
+function normalizeExternalUrl(url) {
+  const value = String(url || '').trim()
+  if (!value) return '#'
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+}
+
+function normalizeImageUrl(url) {
+  const value = String(url || '').trim()
+  if (!value) return ''
+  if (/^https?:\/\//i.test(value)) {
+    return value.replace(/^http:\/\//i, 'https://')
+  }
+  return `https://${value}`
+}
+
+function onImageError(event) {
+  const original = event.target.dataset.original || event.target.src
+  event.target.dataset.original = original
+  if (original.includes('i.ibb.co.com')) {
+    event.target.src = original.replace('i.ibb.co.com', 'i.ibb.co')
+    return
+  }
+  if (original.includes('i.ibb.co')) {
+    event.target.src = original.replace('i.ibb.co', 'i.ibb.co.com')
+  }
 }
 
 onMounted(() => {
@@ -415,25 +443,6 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(8px);
   border-bottom: 1px solid #cfcfcf;
   z-index: 50;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-weight: 600;
-  font-size: 0.88rem;
-}
-
-.brand-logo {
-  width: 1.35rem;
-  height: 1.35rem;
-  object-fit: contain;
-  display: block;
-}
-
-.brand-logo--invert {
-  filter: invert(1);
 }
 
 .nav-links {
@@ -520,23 +529,6 @@ h1 {
   margin-top: 0.65rem;
 }
 
-.hero-socials a {
-  width: 1.85rem;
-  height: 1.85rem;
-  border: 1px solid #111;
-  border-radius: 0.2rem;
-  display: grid;
-  place-items: center;
-  text-decoration: none;
-  color: #111;
-  font-size: 0.68rem;
-}
-
-.hero-socials iconify-icon,
-.contact-socials iconify-icon {
-  font-size: 0.88rem;
-}
-
 .hero-illustration {
   height: 250px;
   display: grid;
@@ -547,16 +539,6 @@ h1 {
   width: min(100%, 360px);
   max-height: 250px;
   object-fit: contain;
-}
-
-.section-title {
-  text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 1rem;
-}
-
-.section-title strong {
-  font-weight: 700;
 }
 
 .skills-grid {
@@ -598,11 +580,6 @@ h1 {
   font-size: 0.76rem;
   color: #555;
   text-align: center;
-}
-
-.experience .section-title,
-.projects .section-title {
-  color: #fff;
 }
 
 .experience-list {
@@ -782,6 +759,14 @@ h1 {
   min-height: 130px;
 }
 
+.certificate-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
 .highlight-card h3 {
   font-size: 1.15rem;
   margin-bottom: 0.55rem;
@@ -856,18 +841,6 @@ h1 {
   gap: 0.4rem;
 }
 
-.contact-socials a {
-  width: 1.85rem;
-  height: 1.85rem;
-  border: 1px solid #111;
-  border-radius: 0.2rem;
-  display: grid;
-  place-items: center;
-  text-decoration: none;
-  color: #111;
-  font-size: 0.68rem;
-}
-
 .contact-copy h2 {
   font-size: 2.2rem;
   line-height: 1.05;
@@ -895,10 +868,6 @@ h1 {
   align-items: center;
   gap: 1rem;
   font-size: 0.78rem;
-}
-
-.footer .brand-logo {
-  filter: brightness(0) invert(1) contrast(1.2);
 }
 
 .state {

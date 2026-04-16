@@ -1,8 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { usePortfolioData } from '../composables/usePortfolioData'
 import BrandLogo from '@/components/BrandLogo.vue'
 
+const route = useRoute()
 const { certificates, loading, error } = usePortfolioData()
 const mobileMenuOpen = ref(false)
 const navItems = [
@@ -10,6 +12,10 @@ const navItems = [
   { label: 'Projects', to: '/projects' },
   { label: 'Certificates', to: '/certificates' },
 ]
+
+const certificate = computed(() =>
+  certificates.value.find((item) => item.id === route.params.id),
+)
 
 function normalizeImageUrl(url) {
   const value = String(url || '').trim()
@@ -72,37 +78,32 @@ function onImageError(event) {
     </nav>
 
     <section class="container">
-      <h1>Certificates</h1>
-      <p class="lead">Verified achievements and professional credentials.</p>
+      <RouterLink to="/certificates" class="back-link">← Back to certificates</RouterLink>
 
-      <p v-if="loading">Loading certificates...</p>
+      <p v-if="loading">Loading certificate...</p>
       <p v-else-if="error" class="error">{{ error }}</p>
-      <div v-else class="grid">
-        <article v-for="certificate in certificates" :key="certificate.id" class="card">
-          <img
-            v-if="certificate.imageUrl"
-            :src="normalizeImageUrl(certificate.imageUrl)"
-            :alt="certificate.title"
-            @error="onImageError"
-            loading="lazy"
-          />
-          <h2>{{ certificate.title }}</h2>
-          <p class="meta">{{ certificate.issuer }} • {{ certificate.year }}</p>
-          <RouterLink
-            :to="{ name: 'certificate-detail', params: { id: certificate.id } }"
-          >
-            Details
-          </RouterLink>
+      <article v-else-if="certificate" class="detail-card">
+        <img
+          v-if="certificate.imageUrl"
+          :src="normalizeImageUrl(certificate.imageUrl)"
+          :alt="certificate.title"
+          class="hero-image"
+          @error="onImageError"
+        />
+        <h1>{{ certificate.title }}</h1>
+        <p class="meta">{{ certificate.issuer }} • {{ certificate.year }}</p>
+        <div class="actions">
           <a
             v-if="certificate.verifyUrl"
             :href="certificate.verifyUrl"
             target="_blank"
             rel="noreferrer"
           >
-            Verify certificate
+            Verify Certificate
           </a>
-        </article>
-      </div>
+        </div>
+      </article>
+      <p v-else class="error">Certificate not found.</p>
     </section>
   </main>
 </template>
@@ -115,7 +116,7 @@ function onImageError(event) {
 }
 
 .container {
-  width: min(100%, 1080px);
+  width: min(100%, 920px);
   margin: 0 auto;
   padding: 4.4rem 1.25rem 0;
 }
@@ -168,66 +169,62 @@ function onImageError(event) {
   display: none;
 }
 
-h1 {
-  font-size: clamp(2rem, 4vw, 2.4rem);
-  margin-bottom: 0.25rem;
-  letter-spacing: -0.02em;
-}
-
-.lead {
+.back-link {
+  text-decoration: none;
+  color: #111;
+  border: 1px solid #111;
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  display: inline-block;
   margin-bottom: 0.8rem;
-  color: #4a4a4a;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-.error {
-  color: #dc2626;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
-  align-items: start;
-}
-
-.card {
+.detail-card {
   border: 1px solid #2d2d2d;
   border-radius: 0.85rem;
-  padding: 0.85rem;
+  padding: 0.95rem;
   background: #111;
   color: #f3f3f3;
-  width: 100%;
-  max-width: 520px;
 }
 
-img {
+.hero-image {
   width: 100%;
-  height: 165px;
+  max-height: 330px;
   object-fit: cover;
-  border-radius: 0.5rem;
-  margin-bottom: 0.65rem;
+  border-radius: 0.65rem;
+  margin-bottom: 0.85rem;
 }
 
-h2 {
-  font-size: 1.25rem;
+h1 {
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
   margin-bottom: 0.3rem;
   letter-spacing: -0.02em;
 }
 
 .meta {
-  margin: 0.35rem 0 0.55rem;
-  font-size: 0.8rem;
   color: #a3a3a3;
+  margin-bottom: 0.75rem;
 }
 
-a {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.actions a {
   color: #fff;
   text-decoration: none;
   border: 1px solid #fff;
   border-radius: 999px;
-  padding: 0.22rem 0.62rem;
-  font-size: 0.74rem;
-  display: inline-block;
+  padding: 0.25rem 0.68rem;
+  font-size: 0.78rem;
+}
+
+.error {
+  color: #dc2626;
 }
 
 @media (max-width: 900px) {
