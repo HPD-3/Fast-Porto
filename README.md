@@ -1,10 +1,11 @@
-# Portfolio Web (Vue + Firestore + Admin API)
+# Portfolio Web (Vue + Firestore + Admin API + Supabase Storage)
 
 Performance-first portfolio with:
 - Public landing page
 - Projects page (category tabs, all published projects)
 - Certificates page (image preview, issuer, year, verification link)
 - Admin dashboard (`/admin`) with Firebase Auth login
+- Image uploads stored in Supabase Storage public buckets
 - Secure admin API in `server/server.js` using Firebase Admin SDK + Firestore
 
 ## Tech stack
@@ -12,6 +13,7 @@ Performance-first portfolio with:
 - Data: Cloud Firestore
 - Auth: Firebase Authentication
 - Admin API: Express + Firebase Admin SDK
+- Image storage: Supabase Storage
 
 ## Public routes
 - `/` landing page
@@ -34,7 +36,9 @@ VITE_FIREBASE_PROJECT_ID=...
 VITE_FIREBASE_STORAGE_BUCKET=...
 VITE_FIREBASE_MESSAGING_SENDER_ID=...
 VITE_FIREBASE_APP_ID=...
-VITE_IMGBB_API_KEY=...
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_SUPABASE_STORAGE_BUCKET=...
 VITE_API_BASE_URL=http://localhost:3001
 ```
 
@@ -58,10 +62,11 @@ PORT=3001
 
 Use `status: "published"` to show items on public pages.
 
-## Image upload (free option)
-- Admin image file uploads can use ImgBB free API.
-- Set `VITE_IMGBB_API_KEY` in `.env` to enable file upload from `/admin`.
-- Uploaded image URL is saved into Firestore `imageUrl`.
+## Image upload
+- Admin image file uploads now go to Supabase Storage.
+- Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_SUPABASE_STORAGE_BUCKET` in `.env`.
+- Uploaded public image URL is saved into Firestore `imageUrl`.
+- Use a public Supabase bucket for the fastest browser delivery.
 
 ## API endpoints
 - Public

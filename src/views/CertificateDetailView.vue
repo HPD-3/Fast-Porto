@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePortfolioData } from '../composables/usePortfolioData'
 import BrandLogo from '@/components/BrandLogo.vue'
@@ -7,6 +7,9 @@ import BrandLogo from '@/components/BrandLogo.vue'
 const route = useRoute()
 const { certificates, loading, error } = usePortfolioData()
 const mobileMenuOpen = ref(false)
+const isImageModalOpen = ref(false)
+const modalImageUrl = ref('')
+const modalImageAlt = ref('')
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Projects', to: '/projects' },
@@ -18,7 +21,7 @@ const certificate = computed(() =>
 )
 
 function normalizeImageUrl(url) {
-  const value = String(url || '').trim()
+  const value = String(url || '').trim().replace(/i\.ibb\.co\.com/gi, 'i.ibb.co')
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) {
     return value.replace(/^http:\/\//i, 'https://')
@@ -31,12 +34,36 @@ function onImageError(event) {
   event.target.dataset.original = original
   if (original.includes('i.ibb.co.com')) {
     event.target.src = original.replace('i.ibb.co.com', 'i.ibb.co')
-    return
-  }
-  if (original.includes('i.ibb.co')) {
-    event.target.src = original.replace('i.ibb.co', 'i.ibb.co.com')
   }
 }
+
+function openImageModal(url, alt) {
+  const normalized = normalizeImageUrl(url)
+  if (!normalized) return
+  modalImageUrl.value = normalized
+  modalImageAlt.value = alt || 'Certificate image'
+  isImageModalOpen.value = true
+}
+
+function closeImageModal() {
+  isImageModalOpen.value = false
+  modalImageUrl.value = ''
+  modalImageAlt.value = ''
+}
+
+function onGlobalKeydown(event) {
+  if (event.key === 'Escape' && isImageModalOpen.value) {
+    closeImageModal()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onGlobalKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onGlobalKeydown)
+})
 </script>
 
 <template>
@@ -89,6 +116,10 @@ function onImageError(event) {
           :alt="certificate.title"
           class="hero-image"
           @error="onImageError"
+          @click="openImageModal(certificate.imageUrl, certificate.title)"
+          @keydown.enter.prevent="openImageModal(certificate.imageUrl, certificate.title)"
+          @keydown.space.prevent="openImageModal(certificate.imageUrl, certificate.title)"
+          tabindex="0"
         />
         <h1>{{ certificate.title }}</h1>
         <p class="meta">{{ certificate.issuer }} • {{ certificate.year }}</p>
@@ -105,6 +136,13 @@ function onImageError(event) {
       </article>
       <p v-else class="error">Certificate not found.</p>
     </section>
+
+    <div v-if="isImageModalOpen" class="image-modal" @click.self="closeImageModal">
+      <button type="button" class="close-modal" @click="closeImageModal" aria-label="Close image preview">
+        ✕
+      </button>
+      <img :src="modalImageUrl" :alt="modalImageAlt" class="modal-image" />
+    </div>
   </main>
 </template>
 
@@ -191,10 +229,51 @@ function onImageError(event) {
 
 .hero-image {
   width: 100%;
-  max-height: 330px;
-  object-fit: cover;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
   border-radius: 0.65rem;
   margin-bottom: 0.85rem;
+  display: block;
+  background: #fff;
+  cursor: zoom-in;
+}
+
+.hero-image:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-image {
+  max-width: min(96vw, 1600px);
+  max-height: 92vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.close-modal {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  cursor: pointer;
 }
 
 h1 {

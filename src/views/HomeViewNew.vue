@@ -24,7 +24,14 @@
           >
             <iconify-icon :icon="mobileMenuOpen ? 'mdi:close' : 'mdi:menu'"></iconify-icon>
           </button>
-          <RouterLink to="/certificates" class="resume-btn">Resume ⤓</RouterLink>
+          <a
+            href="https://drive.google.com/file/d/1-0XqrkubeV1dJkkKsoolgHcq2sFEpK3E/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="resume-btn"
+          >
+            CV ⤓
+          </a>
         </header>
         <nav class="mobile-menu" :class="{ open: mobileMenuOpen }">
           <button
@@ -40,14 +47,15 @@
 
         <div class="hero-content">
           <div class="hero-copy">
-            <p class="eyebrow">Hello I’am <strong>Evren Shah.</strong></p>
+            <p class="eyebrow">Hello I’am <strong>Muhamad Hafidh Khoerullah.</strong></p>
             <h1>
-              Frontend Developer<br />
-              Based In <strong>India.</strong>
+              Web Developer<br />
+              Based In <strong>Bogor, Indonesia.</strong>
             </h1>
             <p class="hero-text">
-              I’m Evren Shah. Lorem ipsum is simply dummy text of the printing and typesetting industry.
-              Lorem ipsum has been the industry’s standard dummy text ever since the 1500s.
+              Vocational high school student majoring in Software and Game Development with hands-on
+              experience building fullstack web applications, API integrations, and database-driven
+              products using Vue, React, Node.js, Express, Laravel, MySQL, Firebase, and Google Cloud.
             </p>
             <SocialLinks class="hero-socials" />
           </div>
@@ -105,13 +113,13 @@
         <div>
           <SectionTitle normal="About " highlight="Me" />
           <p>
-            I’m a product designer and front-end developer focused on crafting clear, useful digital
-            experiences. I combine clean visual design with practical engineering to build interfaces
-            that are fast, maintainable, and easy to use.
+            I’m a web developer and cloud enthusiast from Bogor, Indonesia. I focus on building useful
+            digital products with clean interfaces, dependable backend logic, and practical workflows
+            that are easy to maintain and grow.
           </p>
           <p>
-            My work spans design systems, landing pages, and full web applications. I care about
-            accessibility, consistency, and shipping polished details that improve real user outcomes.
+            My background includes fullstack web apps, school and event projects, REST API integration,
+            database management, and collaborative development through internships, bootcamps, and hackathon-style work.
           </p>
         </div>
       </div>
@@ -156,14 +164,17 @@
         <div v-if="loading" class="state">Loading certificates...</div>
         <div v-else class="highlights-grid">
           <article v-for="certificate in featuredCertificates" :key="certificate.id" class="highlight-card">
-            <img
-              v-if="certificate.imageUrl"
-              :src="normalizeImageUrl(certificate.imageUrl)"
-              :alt="certificate.title"
-              class="certificate-image"
-              @error="onImageError"
-              loading="lazy"
-            />
+            <div class="certificate-image-wrap">
+              <img
+                v-if="certificate.imageUrl"
+                :src="normalizeImageUrl(certificate.imageUrl)"
+                :alt="certificate.title"
+                class="certificate-image"
+                @error="onImageError"
+                loading="lazy"
+              />
+              <div v-else class="certificate-image placeholder">Certificate Preview</div>
+            </div>
             <h3>{{ certificate.title }}</h3>
             <p>{{ certificate.issuer }} · {{ certificate.year }}</p>
             <a
@@ -176,6 +187,9 @@
               Verify ↗
             </a>
           </article>
+        </div>
+        <div v-if="certificates.length > featuredCertificates.length" class="certificates-actions">
+          <RouterLink to="/certificates" class="see-all-certificates">See All Certificates</RouterLink>
         </div>
       </div>
     </section>
@@ -209,7 +223,8 @@
     <footer class="footer section-dark">
       <div class="shell footer-inner">
         <BrandLogo name="Hafidh" />
-        <p>© 2019-2023 Hafidh · Made With ❤︎</p>
+        <p class="footer-center-text">© 2024-{{ currentYear }} Hafidh · Made With ❤︎</p>
+        <span class="footer-spacer" aria-hidden="true"></span>
       </div>
     </footer>
 
@@ -256,6 +271,7 @@ const contactForm = ref({
 })
 const formError = ref('')
 const formSuccess = ref('')
+const currentYear = new Date().getFullYear()
 
 const projectCategories = computed(() => [
   'All',
@@ -270,45 +286,53 @@ const filteredProjects = computed(() => {
   return base.slice(0, 3)
 })
 
-const featuredCertificates = computed(() => certificates.value.slice(0, 3))
+const featuredCertificates = computed(() => certificates.value.slice(0, 6))
 
 const skills = [
+  { name: 'JavaScript', icon: 'mdi:language-javascript' },
+  { name: 'Vue.js', icon: 'simple-icons:vuedotjs', active: true },
+  { name: 'React', icon: 'simple-icons:react' },
+  { name: 'Node.js', icon: 'simple-icons:nodedotjs' },
+  { name: 'Express.js', icon: 'simple-icons:express' },
+  { name: 'Laravel', icon: 'simple-icons:laravel' },
+  { name: 'MySQL', icon: 'simple-icons:mysql' },
+  { name: 'Firebase', icon: 'simple-icons:firebase' },
+  { name: 'Google Cloud', icon: 'simple-icons:googlecloud' },
   { name: 'Git', icon: 'mdi:git' },
-  { name: 'Javascript', icon: 'mdi:language-javascript', active: true },
-  { name: 'Sass/Scss', icon: 'mdi:sass' },
-  { name: 'Nest.Js', icon: 'simple-icons:nestjs' },
-  { name: 'Storybook', icon: 'simple-icons:storybook' },
-  { name: 'Nest.Js', icon: 'simple-icons:nestjs' },
-  { name: 'Git', icon: 'mdi:git' },
-  { name: 'Storybook', icon: 'simple-icons:storybook' },
-  { name: 'Socket.io', icon: 'simple-icons:socketdotio' },
-  { name: 'Sass/Scss', icon: 'mdi:sass' },
 ]
 
 const experiences = [
   {
-    role: 'Lead Software Engineer',
-    company: 'Google',
-    mark: 'logos:google-icon',
-    period: 'Nov 2019 - Present',
+    role: 'Fullstack Developer',
+    company: 'Coding Camp 2026 in Dicoding by DBS',
+    mark: 'simple-icons:dicoding',
+    period: 'Jan 2026 - Present',
     description:
-      'Led end-to-end implementation across major product areas and improved platform quality by driving performance, architecture, and developer tooling initiatives.',
+      'Learning fullstack web development through frontend and backend technologies, RESTful APIs, MySQL, Firebase integration, Git, and deployment workflows with Vercel.',
   },
   {
-    role: 'Software Engineer',
-    company: 'YouTube',
-    mark: 'logos:youtube-icon',
-    period: 'Jan 2017 - Oct 2019',
+    role: 'Web Developer',
+    company: 'JHIC 2025',
+    mark: 'mdi:web',
+    period: 'Aug 2025',
     description:
-      'Built internal systems and creator-facing features, focusing on reliability, delivery speed, and measurable UX improvements for core surfaces.',
+      'Developed a responsive school website using HTML, CSS, JavaScript, and Tailwind CSS while collaborating in a team environment.',
   },
   {
-    role: 'Junior Software Engineer',
-    company: 'Apple',
-    mark: 'logos:apple',
-    period: 'Jan 2016 - Dec 2017',
+    role: 'Game Developer',
+    company: 'Indonesia Game Week',
+    mark: 'mdi:gamepad-variant',
+    period: 'Aug 2025',
     description:
-      'Contributed to foundational UI modules and collaborated across design and engineering teams to ship maintainable components at scale.',
+      'Built a Jakarta-themed educational game in GDevelop, designing gameplay mechanics, assets, and UI within a limited event schedule.',
+  },
+  {
+    role: 'Fullstack Developer',
+    company: 'Coding Camp 2025 in Dicoding by DBS',
+    mark: 'simple-icons:dicoding',
+    period: 'Feb 2024 - Nov 2025',
+    description:
+      'Developed a solar panel monitoring web app using Node.js, API integration, data handling, and responsive interfaces for dashboard-style monitoring.',
   },
 ]
 
@@ -358,7 +382,7 @@ function submitContactForm() {
     return
   }
 
-  const targetEmail = 'youremail@gmail.com'
+  const targetEmail = 'hapidh333@gmail.com'
   const subject = encodeURIComponent(`Portfolio inquiry from ${name.trim()}`)
   const body = encodeURIComponent(
     `Name: ${name.trim()}\nEmail: ${email.trim()}\nWebsite: ${website.trim() || '-'}\n\nMessage:\n${message.trim()}`,
@@ -375,7 +399,7 @@ function normalizeExternalUrl(url) {
 }
 
 function normalizeImageUrl(url) {
-  const value = String(url || '').trim()
+  const value = String(url || '').trim().replace(/i\.ibb\.co\.com/gi, 'i.ibb.co')
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) {
     return value.replace(/^http:\/\//i, 'https://')
@@ -388,10 +412,6 @@ function onImageError(event) {
   event.target.dataset.original = original
   if (original.includes('i.ibb.co.com')) {
     event.target.src = original.replace('i.ibb.co.com', 'i.ibb.co')
-    return
-  }
-  if (original.includes('i.ibb.co')) {
-    event.target.src = original.replace('i.ibb.co', 'i.ibb.co.com')
   }
 }
 
@@ -448,6 +468,9 @@ onBeforeUnmount(() => {
 .nav-links {
   display: flex;
   gap: 1.4rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nav-links button {
@@ -474,6 +497,7 @@ onBeforeUnmount(() => {
   height: 2rem;
   place-items: center;
   cursor: pointer;
+  margin-left: auto;
 }
 
 .menu-toggle iconify-icon {
@@ -492,6 +516,7 @@ onBeforeUnmount(() => {
   border-radius: 0.35rem;
   padding: 0.45rem 0.8rem;
   font-size: 0.78rem;
+  margin-left: auto;
 }
 
 .hero-content {
@@ -757,14 +782,33 @@ h1 {
   background: #f6f6f6;
   padding: 1.1rem;
   min-height: 130px;
+  display: flex;
+  flex-direction: column;
+}
+
+.certificate-image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+  background: #e9e9e9;
+  border: 1px solid #d8d8d8;
 }
 
 .certificate-image {
   width: 100%;
-  height: 160px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 0.5rem;
-  margin-bottom: 0.65rem;
+  display: block;
+}
+
+.certificate-image.placeholder {
+  display: grid;
+  place-items: center;
+  color: #6b6b6b;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
 }
 
 .highlight-card h3 {
@@ -785,6 +829,23 @@ h1 {
   text-decoration: none;
   color: #111;
   font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.certificates-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.see-all-certificates {
+  text-decoration: none;
+  color: #fff;
+  background: #111;
+  border: 1px solid #111;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 
@@ -863,11 +924,21 @@ h1 {
 }
 
 .footer-inner {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
   font-size: 0.78rem;
+}
+
+.footer-center-text {
+  margin: 0;
+  justify-self: center;
+  text-align: center;
+}
+
+.footer-spacer {
+  justify-self: end;
 }
 
 .state {
@@ -914,7 +985,7 @@ h1 {
   }
 
   .highlights-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .contact-copy h2 {
@@ -982,6 +1053,12 @@ h1 {
   .mobile-menu button.active {
     background: #111;
     color: #fff;
+  }
+}
+
+@media (max-width: 640px) {
+  .highlights-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

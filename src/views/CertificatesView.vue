@@ -1,18 +1,59 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { usePortfolioData } from '../composables/usePortfolioData'
 import BrandLogo from '@/components/BrandLogo.vue'
 
 const { certificates, loading, error } = usePortfolioData()
 const mobileMenuOpen = ref(false)
+const selectedIssuer = ref('All')
+const selectedYear = ref('All')
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Projects', to: '/projects' },
   { label: 'Certificates', to: '/certificates' },
 ]
 
+const issuerOptions = computed(() => [
+  'All',
+  ...Array.from(
+    new Set(
+      certificates.value
+        .map((certificate) => String(certificate.issuer || '').trim())
+        .filter(Boolean),
+    ),
+  ).sort((a, b) => a.localeCompare(b)),
+])
+
+const yearOptions = computed(() => [
+  'All',
+  ...Array.from(
+    new Set(
+      certificates.value
+        .map((certificate) => String(certificate.year || '').trim())
+        .filter(Boolean),
+    ),
+  ).sort((a, b) => Number(b) - Number(a)),
+])
+
+const filteredCertificates = computed(() =>
+  certificates.value.filter((certificate) => {
+    const issuer = String(certificate.issuer || '').trim()
+    const year = String(certificate.year || '').trim()
+
+    const issuerMatches = selectedIssuer.value === 'All' || issuer === selectedIssuer.value
+    const yearMatches = selectedYear.value === 'All' || year === selectedYear.value
+
+    return issuerMatches && yearMatches
+  }),
+)
+
+function resetFilters() {
+  selectedIssuer.value = 'All'
+  selectedYear.value = 'All'
+}
+
 function normalizeImageUrl(url) {
-  const value = String(url || '').trim()
+  const value = String(url || '').trim().replace(/i\.ibb\.co\.com/gi, 'i.ibb.co')
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) {
     return value.replace(/^http:\/\//i, 'https://')
@@ -25,10 +66,6 @@ function onImageError(event) {
   event.target.dataset.original = original
   if (original.includes('i.ibb.co.com')) {
     event.target.src = original.replace('i.ibb.co.com', 'i.ibb.co')
-    return
-  }
-  if (original.includes('i.ibb.co')) {
-    event.target.src = original.replace('i.ibb.co', 'i.ibb.co.com')
   }
 }
 </script>
@@ -75,34 +112,61 @@ function onImageError(event) {
       <h1>Certificates</h1>
       <p class="lead">Verified achievements and professional credentials.</p>
 
+      <div class="filters" aria-label="Certificate filters">
+        <label class="filter-group">
+          <span>Issuer</span>
+          <select v-model="selectedIssuer">
+            <option v-for="issuer in issuerOptions" :key="issuer" :value="issuer">{{ issuer }}</option>
+          </select>
+        </label>
+        <label class="filter-group">
+          <span>Year</span>
+          <select v-model="selectedYear">
+            <option v-for="year in yearOptions" :key="year" :value="year">{{ year }}</option>
+          </select>
+        </label>
+        <button type="button" class="reset-button" @click="resetFilters">Clear filters</button>
+      </div>
+
       <p v-if="loading">Loading certificates...</p>
       <p v-else-if="error" class="error">{{ error }}</p>
-      <div v-else class="grid">
-        <article v-for="certificate in certificates" :key="certificate.id" class="card">
-          <img
-            v-if="certificate.imageUrl"
-            :src="normalizeImageUrl(certificate.imageUrl)"
-            :alt="certificate.title"
-            @error="onImageError"
-            loading="lazy"
-          />
-          <h2>{{ certificate.title }}</h2>
-          <p class="meta">{{ certificate.issuer }} • {{ certificate.year }}</p>
-          <RouterLink
-            :to="{ name: 'certificate-detail', params: { id: certificate.id } }"
-          >
-            Details
-          </RouterLink>
-          <a
-            v-if="certificate.verifyUrl"
-            :href="certificate.verifyUrl"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Verify certificate
-          </a>
-        </article>
-      </div>
+      <template v-else>
+        <p class="results-count">Showing {{ filteredCertificates.length }} certificate(s)</p>
+        <div class="grid">
+          <article v-for="certificate in filteredCertificates" :key="certificate.id" class="card">
+            <div class="image-wrap">
+              <img
+                v-if="certificate.imageUrl"
+                :src="normalizeImageUrl(certificate.imageUrl)"
+                :alt="certificate.title"
+                @error="onImageError"
+                loading="lazy"
+              />
+              <div v-else class="image-placeholder">No image</div>
+            </div>
+            <div class="card-body">
+              <h2>{{ certificate.title }}</h2>
+              <p class="meta">{{ certificate.issuer }} • {{ certificate.year }}</p>
+              <RouterLink
+                :to="{ name: 'certificate-detail', params: { id: certificate.id } }"
+              >
+                Details
+              </RouterLink>
+              <a
+                v-if="certificate.verifyUrl"
+                :href="certificate.verifyUrl"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Verify certificate
+              </a>
+            </div>
+          </article>
+        </div>
+        <p v-if="filteredCertificates.length === 0" class="empty-state">
+          No certificates match the selected issuer and year.
+        </p>
+      </template>
     </section>
   </main>
 </template>
@@ -179,13 +243,59 @@ h1 {
   color: #4a4a4a;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 180px;
+}
+
+.filter-group span {
+  font-size: 0.78rem;
+  color: #4a4a4a;
+}
+
+.filter-group select {
+  width: 100%;
+  border: 1px solid #2d2d2d;
+  border-radius: 0.55rem;
+  background: #f6f6f6;
+  color: #111;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+
+.reset-button {
+  border: 1px solid #111;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.results-count,
+.empty-state {
+  margin-bottom: 0.8rem;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
 .error {
   color: #dc2626;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
   align-items: start;
 }
@@ -197,15 +307,43 @@ h1 {
   background: #111;
   color: #f3f3f3;
   width: 100%;
-  max-width: 520px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-img {
+.image-wrap {
   width: 100%;
-  height: 165px;
-  object-fit: cover;
+  aspect-ratio: 16 / 10;
   border-radius: 0.5rem;
+  overflow: hidden;
+  background: #1f1f1f;
   margin-bottom: 0.65rem;
+}
+
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #a3a3a3;
+  font-size: 0.82rem;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
 }
 
 h2 {
@@ -278,6 +416,19 @@ a {
 
   .container {
     padding-top: 4.1rem;
+  }
+
+  .filters {
+    align-items: stretch;
+  }
+
+  .filter-group {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .reset-button {
+    width: 100%;
   }
 }
 </style>
